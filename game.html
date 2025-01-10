@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bliss RPG - Game</title>
+    <link rel="stylesheet" href="game.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js" defer></script>
+    <script src="game.js" defer></script>
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <h1>Welcome, <span id="username"></span>!</h1>
+            <div id="level-container">
+                <span id="level-display">Level 1</span>
+                <div id="progress-bar">
+                    <div id="progress-fill"></div>
+                </div>
+            </div>
+        </header>
+
+        <section id="avatar-container">
+            <canvas id="avatar-canvas" width="200" height="200"></canvas>
+        </section>
+
+        <section id="stats-container">
+            <h2>Your Stats</h2>
+            <p><strong>Role:</strong> <span id="user-role">Member</span></p>
+            <p><strong>Level:</strong> <span id="current-level">1</span></p>
+            <p><strong>Experience:</strong> <span id="current-exp">0</span>/100</p>
+        </section>
+    </div>
+</body>
+</html>
