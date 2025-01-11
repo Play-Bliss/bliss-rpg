@@ -13,11 +13,11 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Centralize Firebase services
-const auth = firebase.auth(); // Only one declaration for auth
+// Centralized Firebase services
+const auth = firebase.auth();
 const database = firebase.database();
 const analytics = firebase.analytics();
 
-// Make Firebase services accessible globally if necessary
+// Expose services globally (if necessary)
 window.firebaseAuth = auth;
 window.firebaseDatabase = database;
