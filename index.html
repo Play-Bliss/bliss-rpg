@@ -5,19 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bliss RPG - Login</title>
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="auth.js" defer></script>
-
-    
-    <!-- Firebase Configuration -->
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <!-- Configuration and Auth Scripts -->
     <script src="firebase-config.js" defer></script>
-    
-    <!-- Authentication Logic -->
     <script src="auth.js" defer></script>
 </head>
 <body>
@@ -43,48 +37,41 @@
         </form>
     </div>
 
-    <!-- Inline Script to Handle Forms -->
     <script>
-        // Debug message for page load
-        console.log("Page loaded and ready.");
+        // Ensure scripts are loaded before using functions
+        console.log("Index.html loaded successfully.");
 
-        // Handling the login form
-        document.getElementById("loginForm").addEventListener("submit", (event) => {
-            event.preventDefault();
+        // Reference Forms
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
 
-            const email = document.getElementById("loginEmail").value;
-            const password = document.getElementById("loginPassword").value;
+        // Login Form Submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
-            console.log("Login attempt:", { email });
-
-            try {
-                // Call global loginUser function from auth.js
+            console.log("Attempting login with email:", email);
+            if (typeof loginUser === 'function') {
                 loginUser(email, password);
-            } catch (error) {
-                console.error("Error during login:", error);
+            } else {
+                console.error("Error: loginUser function is not defined.");
             }
         });
 
-        // Handling the signup form
-        document.getElementById("signupForm").addEventListener("submit", (event) => {
-            event.preventDefault();
+        // Signup Form Submission
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
 
-            const email = document.getElementById("signupEmail").value;
-            const password = document.getElementById("signupPassword").value;
-
-            console.log("Signup attempt:", { email });
-
-            try {
-                // Call global registerUser function from auth.js
+            console.log("Attempting signup with email:", email);
+            if (typeof registerUser === 'function') {
                 registerUser(email, password);
-            } catch (error) {
-                console.error("Error during signup:", error);
+            } else {
+                console.error("Error: registerUser function is not defined.");
             }
         });
-
-        // Check if loginUser and registerUser are available
-        console.log("loginUser function:", typeof loginUser !== "undefined" ? "Available" : "Not Found");
-        console.log("registerUser function:", typeof registerUser !== "undefined" ? "Available" : "Not Found");
     </script>
 </body>
 </html>
