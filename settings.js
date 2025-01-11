@@ -1,97 +1,82 @@
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
-import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 
-// Firebase configuration (if not already initialized globally in firebase-config.js)
+// Firebase configuration (already initialized in firebase-config.js)
 const firebaseConfig = {
-  apiKey: "AIzaSyDsqcVJDGpVPXI8-6ZJcqYwCR9Ejpw43lQ",
-  authDomain: "play-bliss.firebaseapp.com",
-  databaseURL: "https://play-bliss-default-rtdb.firebaseio.com",
-  projectId: "play-bliss",
-  storageBucket: "play-bliss.appspot.com",
-  messagingSenderId: "605761107676",
-  appId: "1:605761107676:web:a5391f6f614f27c27ae619",
-  measurementId: "G-PQMXK8WQKB",
+    apiKey: "AIzaSyDsqcVJDGpVPXI8-6ZJcqYwCR9Ejpw43lQ",
+    authDomain: "play-bliss.firebaseapp.com",
+    databaseURL: "https://play-bliss-default-rtdb.firebaseio.com",
+    projectId: "play-bliss",
+    storageBucket: "play-bliss.appspot.com",
+    messagingSenderId: "605761107676",
+    appId: "1:605761107676:web:a5391f6f614f27c27ae619",
+    measurementId: "G-PQMXK8WQKB",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
+const auth = getAuth(app);
 const database = getDatabase(app);
 
-// Get form and DOM elements
+// HTML Elements
 const usernameForm = document.getElementById("username-form");
 const newUsernameInput = document.getElementById("new-username");
 const statusMessage = document.getElementById("status-message");
 
-// Listen for form submission
-usernameForm.addEventListener("submit", async (e) => {
-  e.preventDefault(); // Prevent page reload on form submission
-
-  const newUsername = newUsernameInput.value.trim();
-
-  // Validate the new username
-  if (newUsername.length < 3 || newUsername.length > 20) {
-    updateStatusMessage(
-      "Username must be between 3 and 20 characters.",
-      "red"
-    );
-    return;
-  }
-
-  // Check if a user is logged in
-  const user = auth.currentUser;
-  if (user) {
-    const userId = user.uid;
-
-    try {
-      // Update username in Firebase
-      const userRef = ref(database, `users/${userId}`);
-      await update(userRef, { username: newUsername });
-
-      // Feedback to user
-      updateStatusMessage("Username updated successfully!", "green");
-
-      // Clear input field
-      newUsernameInput.value = "";
-    } catch (error) {
-      // Handle database update error
-      updateStatusMessage(`Error updating username: ${error.message}`, "red");
-    }
-  } else {
-    updateStatusMessage(
-      "You must be logged in to change your username.",
-      "red"
-    );
-  }
-});
-
-// Utility function for updating status messages
-function updateStatusMessage(message, color) {
-  statusMessage.textContent = message;
-  statusMessage.style.color = color;
-}
-// Display current username on the settings page
-const currentUsernameElement = document.getElementById("current-username");
-
-// Fetch and display the user's current username
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        const userId = user.uid;
-        const userRef = ref(database, `users/${userId}`);
-        
-        try {
-            const snapshot = await get(userRef);
-            if (snapshot.exists() && snapshot.val().username) {
-                currentUsernameElement.textContent = snapshot.val().username;
-            } else {
-                currentUsernameElement.textContent = "Player";
+// Display current username on page load
+function loadCurrentUsername() {
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userRef = ref(database, `users/${user.uid}/username`);
+            try {
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    newUsernameInput.placeholder = `Current: ${snapshot.val()}`;
+                } else {
+                    newUsernameInput.placeholder = "Enter username";
+                }
+            } catch (error) {
+                statusMessage.textContent = `Error loading username: ${error.message}`;
+                statusMessage.style.color = "red";
             }
-        } catch (error) {
-            currentUsernameElement.textContent = "Error loading username.";
-            console.error("Error fetching username:", error);
+        } else {
+            statusMessage.textContent = "You must be logged in to view settings.";
+            statusMessage.style.color = "red";
         }
-    } else {
-        currentUsernameElement.textContent = "Not logged in.";
+    });
+}
+
+// Save the new username to the database
+usernameForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newUsername = newUsernameInput.value.trim();
+
+    // Validate username
+    if (newUsername.length < 3 || newUsername.length > 20) {
+        statusMessage.textContent = "Username must be between 3 and 20 characters.";
+        statusMessage.style.color = "red";
+        return;
     }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userRef = ref(database, `users/${user.uid}`);
+            try {
+                await update(userRef, { username: newUsername });
+                statusMessage.textContent = "Username updated successfully!";
+                statusMessage.style.color = "green";
+                newUsernameInput.placeholder = `Current: ${newUsername}`;
+                newUsernameInput.value = "";
+            } catch (error) {
+                statusMessage.textContent = `Error updating username: ${error.message}`;
+                statusMessage.style.color = "red";
+            }
+        } else {
+            statusMessage.textContent = "You must be logged in to change your username.";
+            statusMessage.style.color = "red";
+        }
+    });
 });
+
+// Load current username on page load
+loadCurrentUsername();
