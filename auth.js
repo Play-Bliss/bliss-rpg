@@ -25,6 +25,7 @@ function loginUser(email, password) {
         console.error("Auth is not initialized. Login aborted.");
         return;
     }
+
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
             console.log("User logged in successfully:", userCredential.user);
@@ -34,7 +35,27 @@ function loginUser(email, password) {
         })
         .catch((error) => {
             console.error("Login error:", error.code, error.message);
-            alert("Login failed: " + error.message);
+
+            // Detailed error handling
+            let errorMessage = "";
+            switch (error.code) {
+                case "auth/invalid-email":
+                    errorMessage = "The email address is invalid.";
+                    break;
+                case "auth/user-disabled":
+                    errorMessage = "This account has been disabled.";
+                    break;
+                case "auth/user-not-found":
+                    errorMessage = "No account found for this email. Please sign up.";
+                    break;
+                case "auth/wrong-password":
+                    errorMessage = "Incorrect password. Please try again.";
+                    break;
+                default:
+                    errorMessage = "Login failed: " + error.message;
+                    break;
+            }
+            alert(errorMessage);
         });
 }
 
@@ -45,6 +66,7 @@ function registerUser(email, password) {
         console.error("Auth is not initialized. Signup aborted.");
         return;
     }
+
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             console.log("User registered successfully:", userCredential.user);
@@ -60,7 +82,24 @@ function registerUser(email, password) {
         })
         .catch((error) => {
             console.error("Signup error:", error.code, error.message);
-            alert("Signup failed: " + error.message);
+
+            // Detailed error handling
+            let errorMessage = "";
+            switch (error.code) {
+                case "auth/email-already-in-use":
+                    errorMessage = "This email is already in use. Please try logging in.";
+                    break;
+                case "auth/invalid-email":
+                    errorMessage = "The email address is invalid.";
+                    break;
+                case "auth/weak-password":
+                    errorMessage = "The password is too weak. Please choose a stronger one.";
+                    break;
+                default:
+                    errorMessage = "Signup failed: " + error.message;
+                    break;
+            }
+            alert(errorMessage);
         });
 }
 
