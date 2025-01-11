@@ -13,18 +13,12 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Check and initialize Analytics if supported
-try {
-    const analytics = firebase.analytics();
-    console.log("Analytics initialized successfully.");
-} catch (error) {
-    console.warn("Firebase Analytics is not available:", error.message);
-}
-
-// Initialize other Firebase services
+// Initialize Firebase services
+const database = firebase.database(); // No error if compatibility version is used
 const auth = firebase.auth();
-const database = firebase.database();
+const analytics = firebase.analytics();
 
-// Optionally export services globally
+// Optionally, export services globally for use in other scripts
 window.firebaseAuth = auth;
 window.firebaseDatabase = database;
+window.firebaseAnalytics = analytics;
