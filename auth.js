@@ -1,116 +1,74 @@
-// Debugging: Confirm auth.js is loaded
-console.log("auth.js loading...");
+console.log("auth.js loaded successfully.");
 
-// Ensure Firebase is initialized before using auth
-if (!firebase.apps.length) {
-    console.log("Initializing Firebase...");
-    firebase.initializeApp(firebaseConfig);
-} else {
-    console.log("Firebase already initialized.");
-}
-
-// Reference Firebase Auth after initialization
+// Firebase Authentication Reference
 let auth;
 try {
-    auth = firebase.auth();
-    console.log("Firebase Auth initialized successfully.");
+    if (!firebase.apps.length) {
+        console.error("Firebase is not initialized. Ensure firebase-config.js is loaded before auth.js.");
+    } else {
+        auth = firebase.auth();
+        console.log("Firebase Auth initialized:", auth);
+    }
 } catch (error) {
     console.error("Error initializing Firebase Auth:", error);
 }
 
-// Login function
+// Login Function
 function loginUser(email, password) {
     console.log("loginUser called with email:", email);
+
     if (!auth) {
-        console.error("Auth is not initialized. Login aborted.");
+        console.error("Firebase Auth not initialized. Login attempt failed.");
+        alert("Authentication service is unavailable. Please try again later.");
         return;
     }
 
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            console.log("User logged in successfully:", userCredential.user);
+            console.log("Login successful:", userCredential.user);
             alert("Login successful!");
-            // Redirect to the main game page
-            window.location.href = "game.html";
+            window.location.href = "game.html"; // Redirect to game page
         })
         .catch((error) => {
-            console.error("Login error:", error.code, error.message);
-
-            // Detailed error handling
-            let errorMessage = "";
-            switch (error.code) {
-                case "auth/invalid-email":
-                    errorMessage = "The email address is invalid.";
-                    break;
-                case "auth/user-disabled":
-                    errorMessage = "This account has been disabled.";
-                    break;
-                case "auth/user-not-found":
-                    errorMessage = "No account found for this email. Please sign up.";
-                    break;
-                case "auth/wrong-password":
-                    errorMessage = "Incorrect password. Please try again.";
-                    break;
-                default:
-                    errorMessage = "Login failed: " + error.message;
-                    break;
-            }
-            alert(errorMessage);
+            console.error("Login failed:", error);
+            alert("Error during login: " + error.message);
         });
 }
 
-// Signup function
+// Signup Function
 function registerUser(email, password) {
     console.log("registerUser called with email:", email);
+
     if (!auth) {
-        console.error("Auth is not initialized. Signup aborted.");
+        console.error("Firebase Auth not initialized. Signup attempt failed.");
+        alert("Authentication service is unavailable. Please try again later.");
         return;
     }
 
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            console.log("User registered successfully:", userCredential.user);
-            alert("Signup successful! Please verify your email.");
-            // Send email verification
-            userCredential.user.sendEmailVerification()
+            console.log("Signup successful:", userCredential.user);
+
+            // Send verification email
+            const user = userCredential.user;
+            user.sendEmailVerification()
                 .then(() => {
-                    console.log("Email verification sent to:", email);
+                    console.log("Verification email sent to:", user.email);
+                    alert("Signup successful! Verification email sent.");
                 })
                 .catch((emailError) => {
-                    console.error("Error sending email verification:", emailError.code, emailError.message);
+                    console.error("Error sending verification email:", emailError);
                 });
+
+            // Redirect or show confirmation message
         })
         .catch((error) => {
-            console.error("Signup error:", error.code, error.message);
-
-            // Detailed error handling
-            let errorMessage = "";
-            switch (error.code) {
-                case "auth/email-already-in-use":
-                    errorMessage = "This email is already in use. Please try logging in.";
-                    break;
-                case "auth/invalid-email":
-                    errorMessage = "The email address is invalid.";
-                    break;
-                case "auth/weak-password":
-                    errorMessage = "The password is too weak. Please choose a stronger one.";
-                    break;
-                default:
-                    errorMessage = "Signup failed: " + error.message;
-                    break;
-            }
-            alert(errorMessage);
+            console.error("Signup failed:", error);
+            alert("Error during signup: " + error.message);
         });
 }
 
-// Expose functions globally
-try {
-    window.loginUser = loginUser;
-    window.registerUser = registerUser;
-    console.log("Functions loginUser and registerUser exposed globally.");
-} catch (error) {
-    console.error("Error exposing functions globally:", error);
-}
-
-// Debugging: Ready state
-console.log("auth.js loaded and ready.");
+// Expose Functions Globally
+window.loginUser = loginUser;
+window.registerUser = registerUser;
+console.log("loginUser and registerUser functions are globally available.");
