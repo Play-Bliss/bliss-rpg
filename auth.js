@@ -1,4 +1,4 @@
-// Import Firebase Authentication and related functions
+// Import Firebase Authentication and functions
 import { auth } from "./firebase-config.js";
 import {
     signInWithEmailAndPassword,
@@ -7,8 +7,8 @@ import {
     signOut,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 
-// Handle user sign-in
-const loginUser = (email, password) => {
+// Login Function
+function loginUser(email, password) {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             console.log("User logged in:", userCredential.user);
@@ -19,10 +19,10 @@ const loginUser = (email, password) => {
         .catch((error) => {
             console.error("Error during login:", error.message);
         });
-};
+}
 
-// Handle user registration
-const registerUser = (email, password) => {
+// Register Function
+function registerUser(email, password) {
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             console.log("User registered:", userCredential.user);
@@ -37,32 +37,8 @@ const registerUser = (email, password) => {
         .catch((error) => {
             console.error("Error during registration:", error.message);
         });
-};
+}
 
-// Handle user logout
-const logoutUser = () => {
-    signOut(auth)
-        .then(() => {
-            console.log("User logged out.");
-        })
-        .catch((error) => {
-            console.error("Error during logout:", error.message);
-        });
-};
-
-// Example: Add event listeners to buttons in your HTML
-document.getElementById("login-btn").addEventListener("click", () => {
-    const email = document.getElementById("login-email").value;
-    const password = document.getElementById("login-password").value;
-    loginUser(email, password);
-});
-
-document.getElementById("register-btn").addEventListener("click", () => {
-    const email = document.getElementById("register-email").value;
-    const password = document.getElementById("register-password").value;
-    registerUser(email, password);
-});
-
-document.getElementById("logout-btn").addEventListener("click", () => {
-    logoutUser();
-});
+// Expose functions globally
+window.loginUser = loginUser;
+window.registerUser = registerUser;
