@@ -33,6 +33,18 @@
             <p><strong>Level:</strong> <span id="current-level">1</span></p>
             <p><strong>Experience:</strong> <span id="current-exp">0</span>/100</p>
         </section>
+
+        <!-- Settings Button -->
+        <section id="settings-container">
+            <button id="settings-button" onclick="goToSettings()">Settings</button>
+        </section>
     </div>
+
+    <script>
+        // Redirect to Settings Page
+        function goToSettings() {
+            window.location.href = 'settings.html';
+        }
+    </script>
 </body>
 </html>
