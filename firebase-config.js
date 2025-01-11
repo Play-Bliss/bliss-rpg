@@ -1,4 +1,10 @@
-// Firebase configuration
+// Import Firebase modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
+import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js";
+
+// Firebase configuration object
 const firebaseConfig = {
     apiKey: "AIzaSyDsqcVJDGpVPXI8-6ZJcqYwCR9Ejpw43lQ",
     authDomain: "play-bliss.firebaseapp.com",
@@ -10,14 +16,28 @@ const firebaseConfig = {
     measurementId: "G-PQMXK8WQKB",
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase App
+const app = initializeApp(firebaseConfig);
 
-// Centralized Firebase services
-const auth = firebase.auth();
-const database = firebase.database();
-const analytics = firebase.analytics();
+// Initialize Firebase services
+export const auth = getAuth(app); // Firebase Authentication
+export const database = getDatabase(app); // Firebase Realtime Database
 
-// Expose services globally (if necessary)
-window.firebaseAuth = auth;
-window.firebaseDatabase = database;
+// Initialize Firebase Analytics (with feature support check)
+let analytics = null;
+isSupported()
+    .then((supported) => {
+        if (supported) {
+            analytics = getAnalytics(app);
+            console.log("Firebase Analytics initialized!");
+        } else {
+            console.warn("Firebase Analytics is not supported on this device/browser.");
+        }
+    })
+    .catch((error) => {
+        console.error("Error initializing Firebase Analytics:", error.message);
+    });
+
+// Export other Firebase instances (if needed)
+export { analytics };
+
