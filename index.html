@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bliss RPG - Login</title>
     <link rel="stylesheet" href="styles.css">
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-database-compat.js"></script>
     
-    <!-- Firebase Config -->
+    <!-- Firebase Configuration -->
     <script src="firebase-config.js" defer></script>
-
-    <!-- Authentication -->
+    
+    <!-- Authentication Logic -->
     <script src="auth.js" defer></script>
 </head>
 <body>
@@ -41,27 +41,25 @@
         </form>
     </div>
 
-    <!-- Inline Script for Form Handlers -->
+    <!-- Inline Script to Handle Forms -->
     <script>
         // Handling the login form
-        const loginForm = document.getElementById("loginForm");
-        loginForm.addEventListener("submit", (event) => {
+        document.getElementById("loginForm").addEventListener("submit", (event) => {
             event.preventDefault();
             const email = document.getElementById("loginEmail").value;
             const password = document.getElementById("loginPassword").value;
 
-            // Call login function (auth.js)
+            // Use globally exposed loginUser from auth.js
             loginUser(email, password);
         });
 
         // Handling the signup form
-        const signupForm = document.getElementById("signupForm");
-        signupForm.addEventListener("submit", (event) => {
+        document.getElementById("signupForm").addEventListener("submit", (event) => {
             event.preventDefault();
             const email = document.getElementById("signupEmail").value;
             const password = document.getElementById("signupPassword").value;
 
-            // Call signup function (auth.js)
+            // Use globally exposed registerUser from auth.js
             registerUser(email, password);
         });
     </script>
