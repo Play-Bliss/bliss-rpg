@@ -1,67 +1,49 @@
-// Firebase Auth and Database Initialization
-const auth = firebase.auth();
-const database = firebase.database();
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 
-// User data
-let user = null;
-const progressFill = document.getElementById("progress-fill");
-const levelDisplay = document.getElementById("level-display");
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDsqcVJDGpVPXI8-6ZJcqYwCR9Ejpw43lQ",
+    authDomain: "play-bliss.firebaseapp.com",
+    databaseURL: "https://play-bliss-default-rtdb.firebaseio.com",
+    projectId: "play-bliss",
+    storageBucket: "play-bliss.appspot.com",
+    messagingSenderId: "605761107676",
+    appId: "1:605761107676:web:a5391f6f614f27c27ae619",
+    measurementId: "G-PQMXK8WQKB",
+};
 
-// Draw Avatar
-function drawAvatar() {
-    const canvas = document.getElementById("avatar-canvas");
-    const ctx = canvas.getContext("2d");
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const database = getDatabase(app);
 
-    // Avatar body
-    ctx.fillStyle = "#87CEEB";
-    ctx.fillRect(50, 80, 100, 100);
+// DOM Elements
+const usernameElement = document.getElementById("username");
+const userRoleElement = document.getElementById("user-role");
+const userLevelElement = document.getElementById("current-level");
+const userExpElement = document.getElementById("current-exp");
 
-    // Avatar head
-    ctx.fillStyle = "#FFD700";
-    ctx.beginPath();
-    ctx.arc(100, 60, 30, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Avatar arms
-    ctx.fillStyle = "#87CEEB";
-    ctx.fillRect(30, 100, 20, 50);
-    ctx.fillRect(150, 100, 20, 50);
-}
-
-// Update User Stats
-function updateUserStats(user) {
-    const userRef = database.ref(`users/${user.uid}`);
-
-    userRef.once("value", (snapshot) => {
-        if (snapshot.exists()) {
+// Fetch User Data
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        const userRef = ref(database, `users/${user.uid}`);
+        onValue(userRef, (snapshot) => {
             const data = snapshot.val();
-            document.getElementById("username").innerText = user.displayName || "Player";
-            document.getElementById("user-role").innerText = data.role || "Member";
-            document.getElementById("current-level").innerText = data.level || 1;
-            document.getElementById("current-exp").innerText = data.exp || 0;
 
-            // Update level bar
-            const levelExp = data.exp % 100;
-            progressFill.style.width = `${levelExp}%`;
-            levelDisplay.innerText = `Level ${data.level}`;
-        }
-    });
-}
-
-// Handle Firebase User
-auth.onAuthStateChanged((currentUser) => {
-    if (currentUser) {
-        user = currentUser;
-
-        // Check user's role
-        database
-            .ref(`users/${user.uid}`)
-            .set({ role: "Member", level: 1, exp: 0 })
-            .catch((err) => console.error(err));
-
-        drawAvatar();
-        updateUserStats(user);
+            // Update UI with user data
+            if (data) {
+                usernameElement.textContent = data.username || "Player";
+                userRoleElement.textContent = data.role || "Member";
+                userLevelElement.textContent = data.level || 1;
+                userExpElement.textContent = data.experience || 0;
+            } else {
+                usernameElement.textContent = "Player";
+                console.warn("No user data found in database.");
+            }
+        });
     } else {
-        window.location.href = "index.html"; // Redirect to login if not authenticated
+        window.location.href = "index.html"; // Redirect to login
     }
 });
