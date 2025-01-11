@@ -1,41 +1,36 @@
-// Import Firebase Authentication and functions
-import { auth } from "./firebase-config.js";
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    sendEmailVerification,
-    signOut,
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+// Ensure Firebase is initialized correctly
+firebase.initializeApp(firebaseConfig);
 
-// Login Function
+// Reference Firebase Auth
+const auth = firebase.auth();
+
+// Login function
 function loginUser(email, password) {
-    signInWithEmailAndPassword(auth, email, password)
+    auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
             console.log("User logged in:", userCredential.user);
-            if (!userCredential.user.emailVerified) {
-                console.warn("Email is not verified. Please verify your email.");
-            }
+            alert("Login successful!");
+            // Redirect to the main game page
+            window.location.href = "game.html";
         })
         .catch((error) => {
-            console.error("Error during login:", error.message);
+            console.error("Login error:", error);
+            alert("Login failed: " + error.message);
         });
 }
 
-// Register Function
+// Signup function
 function registerUser(email, password) {
-    createUserWithEmailAndPassword(auth, email, password)
+    auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             console.log("User registered:", userCredential.user);
-            sendEmailVerification(userCredential.user)
-                .then(() => {
-                    console.log("Email verification sent.");
-                })
-                .catch((error) => {
-                    console.error("Error sending email verification:", error.message);
-                });
+            alert("Signup successful! Please verify your email.");
+            // Send email verification
+            userCredential.user.sendEmailVerification();
         })
         .catch((error) => {
-            console.error("Error during registration:", error.message);
+            console.error("Signup error:", error);
+            alert("Signup failed: " + error.message);
         });
 }
 
