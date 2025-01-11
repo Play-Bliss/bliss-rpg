@@ -71,3 +71,27 @@ function updateStatusMessage(message, color) {
   statusMessage.textContent = message;
   statusMessage.style.color = color;
 }
+// Display current username on the settings page
+const currentUsernameElement = document.getElementById("current-username");
+
+// Fetch and display the user's current username
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        const userId = user.uid;
+        const userRef = ref(database, `users/${userId}`);
+        
+        try {
+            const snapshot = await get(userRef);
+            if (snapshot.exists() && snapshot.val().username) {
+                currentUsernameElement.textContent = snapshot.val().username;
+            } else {
+                currentUsernameElement.textContent = "Player";
+            }
+        } catch (error) {
+            currentUsernameElement.textContent = "Error loading username.";
+            console.error("Error fetching username:", error);
+        }
+    } else {
+        currentUsernameElement.textContent = "Not logged in.";
+    }
+});
