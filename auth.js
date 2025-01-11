@@ -1,14 +1,30 @@
-// Ensure Firebase is initialized correctly
-console.log("Initializing Firebase in auth.js...");
-firebase.initializeApp(firebaseConfig);
+// Debugging: Confirm auth.js is loaded
+console.log("auth.js loading...");
 
-// Reference Firebase Auth
-const auth = firebase.auth();
-console.log("Firebase Auth initialized.");
+// Ensure Firebase is initialized before using auth
+if (!firebase.apps.length) {
+    console.log("Initializing Firebase...");
+    firebase.initializeApp(firebaseConfig);
+} else {
+    console.log("Firebase already initialized.");
+}
+
+// Reference Firebase Auth after initialization
+let auth;
+try {
+    auth = firebase.auth();
+    console.log("Firebase Auth initialized successfully.");
+} catch (error) {
+    console.error("Error initializing Firebase Auth:", error);
+}
 
 // Login function
 function loginUser(email, password) {
     console.log("loginUser called with email:", email);
+    if (!auth) {
+        console.error("Auth is not initialized. Login aborted.");
+        return;
+    }
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
             console.log("User logged in successfully:", userCredential.user);
@@ -25,6 +41,10 @@ function loginUser(email, password) {
 // Signup function
 function registerUser(email, password) {
     console.log("registerUser called with email:", email);
+    if (!auth) {
+        console.error("Auth is not initialized. Signup aborted.");
+        return;
+    }
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             console.log("User registered successfully:", userCredential.user);
@@ -44,15 +64,14 @@ function registerUser(email, password) {
         });
 }
 
-// Debugging global exposure
+// Expose functions globally
 try {
-    // Expose functions globally for use in index.html
     window.loginUser = loginUser;
     window.registerUser = registerUser;
     console.log("Functions loginUser and registerUser exposed globally.");
-} catch (exposureError) {
-    console.error("Error exposing loginUser and registerUser functions:", exposureError);
+} catch (error) {
+    console.error("Error exposing functions globally:", error);
 }
 
-// Add ready-state message to console
+// Debugging: Ready state
 console.log("auth.js loaded and ready.");
