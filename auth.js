@@ -1,50 +1,68 @@
-// auth.js
+// Import Firebase Authentication and related functions
+import { auth } from "./firebase-config.js";
+import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    signOut,
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 
-// Reference to Firebase auth
-const auth = firebase.auth();
-
-// Login Functionality
-document.getElementById("loginForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    auth.signInWithEmailAndPassword(email, password)
+// Handle user sign-in
+const loginUser = (email, password) => {
+    signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            const user = userCredential.user;
-            if (user.emailVerified) {
-                alert("Login successful!");
-                // Redirect to the game
-                window.location.href = "game.html";
-            } else {
-                alert("Please verify your email first!");
+            console.log("User logged in:", userCredential.user);
+            if (!userCredential.user.emailVerified) {
+                console.warn("Email is not verified. Please verify your email.");
             }
         })
         .catch((error) => {
-            alert(error.message);
+            console.error("Error during login:", error.message);
         });
-});
+};
 
-// Signup Functionality
-document.getElementById("signupForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-
-    auth.createUserWithEmailAndPassword(email, password)
+// Handle user registration
+const registerUser = (email, password) => {
+    createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            const user = userCredential.user;
-            user.sendEmailVerification()
+            console.log("User registered:", userCredential.user);
+            sendEmailVerification(userCredential.user)
                 .then(() => {
-                    alert("Signup successful! Please check your email to verify your account.");
+                    console.log("Email verification sent.");
                 })
                 .catch((error) => {
-                    alert(error.message);
+                    console.error("Error sending email verification:", error.message);
                 });
         })
         .catch((error) => {
-            alert(error.message);
+            console.error("Error during registration:", error.message);
         });
+};
+
+// Handle user logout
+const logoutUser = () => {
+    signOut(auth)
+        .then(() => {
+            console.log("User logged out.");
+        })
+        .catch((error) => {
+            console.error("Error during logout:", error.message);
+        });
+};
+
+// Example: Add event listeners to buttons in your HTML
+document.getElementById("login-btn").addEventListener("click", () => {
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+    loginUser(email, password);
+});
+
+document.getElementById("register-btn").addEventListener("click", () => {
+    const email = document.getElementById("register-email").value;
+    const password = document.getElementById("register-password").value;
+    registerUser(email, password);
+});
+
+document.getElementById("logout-btn").addEventListener("click", () => {
+    logoutUser();
 });
