@@ -14,16 +14,26 @@
 <body>
     <div id="settings-container">
         <h1>Settings</h1>
-        
+
         <!-- Profile Customization Section -->
         <div id="profile-section">
             <h2>Profile Customization</h2>
             <form id="username-form">
                 <label for="new-username">Change Username:</label>
-                <input type="text" id="new-username" placeholder="Enter new username" required>
+                <input 
+                    type="text" 
+                    id="new-username" 
+                    placeholder="Enter new username" 
+                    required
+                >
                 <button type="submit">Save</button>
             </form>
             <p id="status-message"></p>
+        </div>
+
+        <div id="current-info">
+            <h3>Current Username</h3>
+            <p id="current-username">Loading...</p>
         </div>
 
         <button onclick="goBack()">Back to Game</button>
