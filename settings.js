@@ -24,22 +24,34 @@ const newUsernameInput = document.getElementById("new-username");
 const statusMessage = document.getElementById("status-message");
 
 // Display current username on page load
-function loadCurrentUsername() {
+async function loadCurrentUsername() {
+    statusMessage.textContent = "Loading...";
+    statusMessage.style.color = "blue";
+    console.log("Attempting to load username...");
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
+            console.log("User detected:", user.uid);
             const userRef = ref(database, `users/${user.uid}/username`);
             try {
                 const snapshot = await get(userRef);
                 if (snapshot.exists()) {
-                    newUsernameInput.placeholder = `Current: ${snapshot.val()}`;
+                    const username = snapshot.val();
+                    console.log("Loaded username:", username);
+                    newUsernameInput.placeholder = `Current: ${username}`;
+                    statusMessage.textContent = ""; // Clear loading message
                 } else {
-                    newUsernameInput.placeholder = "Enter username";
+                    console.warn("No username found for the user.");
+                    newUsernameInput.placeholder = "Enter new username";
+                    statusMessage.textContent = "";
                 }
             } catch (error) {
+                console.error("Error loading username:", error.message);
                 statusMessage.textContent = `Error loading username: ${error.message}`;
                 statusMessage.style.color = "red";
             }
         } else {
+            console.warn("No user logged in.");
             statusMessage.textContent = "You must be logged in to view settings.";
             statusMessage.style.color = "red";
         }
@@ -60,18 +72,22 @@ usernameForm.addEventListener("submit", async (e) => {
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
+            console.log("Updating username for user:", user.uid);
             const userRef = ref(database, `users/${user.uid}`);
             try {
                 await update(userRef, { username: newUsername });
+                console.log("Username updated successfully to:", newUsername);
                 statusMessage.textContent = "Username updated successfully!";
                 statusMessage.style.color = "green";
                 newUsernameInput.placeholder = `Current: ${newUsername}`;
                 newUsernameInput.value = "";
             } catch (error) {
+                console.error("Error updating username:", error.message);
                 statusMessage.textContent = `Error updating username: ${error.message}`;
                 statusMessage.style.color = "red";
             }
         } else {
+            console.warn("No user logged in for username update.");
             statusMessage.textContent = "You must be logged in to change your username.";
             statusMessage.style.color = "red";
         }
