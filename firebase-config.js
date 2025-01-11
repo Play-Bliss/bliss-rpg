@@ -1,10 +1,4 @@
-// Import necessary Firebase functions
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
-
-// Firebase configuration object
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDsqcVJDGpVPXI8-6ZJcqYwCR9Ejpw43lQ",
     authDomain: "play-bliss.firebaseapp.com",
@@ -17,11 +11,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
-// Initialize Analytics
-const analytics = getAnalytics(app);
+// Initialize Firebase services
+const analytics = firebase.analytics();
+const auth = firebase.auth();
+const database = firebase.database();
 
-// Export Firebase services if needed
-export const auth = getAuth(app);
-export const database = getDatabase(app);
+// Optionally, expose services globally
+window.firebaseAuth = auth;
+window.firebaseDatabase = database;
+window.firebaseAnalytics = analytics;
