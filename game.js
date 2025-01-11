@@ -43,7 +43,6 @@ const avatarContext = avatarCanvas.getContext("2d");
 function drawAvatar() {
     try {
         console.log("Drawing avatar...");
-        // Clear the canvas
         avatarContext.clearRect(0, 0, avatarCanvas.width, avatarCanvas.height);
 
         // Draw a face (circle)
@@ -87,6 +86,12 @@ auth.onAuthStateChanged((user) => {
             const data = snapshot.val();
 
             if (data) {
+                if (!data.username) {
+                    console.warn(`No username found for user ID: ${user.uid}. Defaulting to 'Player'.`);
+                } else {
+                    console.log(`Username found: ${data.username}`);
+                }
+                
                 // Update UI with user data
                 usernameElement.textContent = data.username || "Player";
                 userRoleElement.textContent = data.role || "Member";
@@ -97,7 +102,7 @@ auth.onAuthStateChanged((user) => {
                 const progress = (data.experience || 0) / 100; // Assuming max XP for each level is 100
                 progressBarFill.style.width = `${progress * 100}%`;
 
-                console.log("UI updated with user data.");
+                console.log(`UI updated with username: ${data.username || "Player"}`);
             } else {
                 console.warn("No user data found. Setting default values.");
                 usernameElement.textContent = "Player";
@@ -111,9 +116,25 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// Debugging Function
+// Debugging Function for Usernames
+function debugUsernames() {
+    const user = auth.currentUser;
+    console.log("Debugging Username State:");
+    console.log("Auth Current User:", user);
+    if (user) {
+        console.log("User ID:", user.uid);
+        console.log("Expected Database Path:", `users/${user.uid}`);
+    } else {
+        console.warn("No authenticated user. Username debugging skipped.");
+    }
+}
+
+// Call debugging function for usernames on page load
+debugUsernames();
+
+// Global Debugging State
 function debugState() {
-    console.log("Debugging Current State:");
+    console.log("Debugging Global State:");
     console.log("App Initialized:", !!app);
     console.log("Auth Initialized:", !!auth);
     console.log("Database Initialized:", !!database);
@@ -126,5 +147,5 @@ function debugState() {
     });
 }
 
-// Call debugging function at load
+// Call global debugging function on page load
 debugState();
